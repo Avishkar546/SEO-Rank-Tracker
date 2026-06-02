@@ -1,9 +1,10 @@
-import { configDotenv } from 'dotenv';
+import dotenv from 'dotenv';
+dotenv.config();
+
+import dns from 'dns';
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 import {connectToDB} from './src/config/db.config.js'
 import app from './src/app.js';
-
-
-configDotenv();
 
 const port = process.env.PORT || 3000;
 
