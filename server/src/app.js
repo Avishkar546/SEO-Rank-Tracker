@@ -11,7 +11,7 @@ const app = express();
 app.use(helmet());
 
 // 2. CORS CONFIGURATION (Blocks unallowed origins early)
-app.use(cors({ origin: 'https://yourfrontend.com' }));
+app.use(cors());
 
 // 3. RATE LIMITING (Prevents DoS attacks before consuming server parsing resources)
 // const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
