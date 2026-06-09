@@ -4,6 +4,8 @@ import helmet from 'helmet';
 // import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.route.js';
+import keywordRoutes from './routes/rankTrack.route.js';
+import { authenticateJWT } from './middlewares/auth.middleware.js';
 
 const app = express();
 
@@ -35,8 +37,9 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('api/v1/rankkeyword', authenticateJWT, keywordRoutes);
 
-// 404 Handler
+// 404 Handlerx
 app.use((req, res) => {
   res.status(404).json({
     success: false,
