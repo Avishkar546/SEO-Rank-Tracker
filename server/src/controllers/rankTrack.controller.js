@@ -35,7 +35,7 @@ export const addKeyword = async (req, res) => {
 		const exists = await KeywordTracking.findOne({ userId, keyword: keyword.toLowerCase().trim(), domain });
 		if (exists) return res.status(409).json({ success: false, message: 'Keyword already tracked' });
 
-		const tracking = new KeywordTracking.create({
+		const tracking = await KeywordTracking.create({
 			userId,
 			keyword: keyword.toLowerCase().trim(),
 			url: url.startsWith("http") ? url : `https://${url}`,
@@ -43,11 +43,10 @@ export const addKeyword = async (req, res) => {
 			status: "checking"
 		});
 
-		// await doc.save();
-		return res.status(201).json({ success: true, message: "keyword tracking started", tracking });
+		res.status(201).json({ success: true, message: "keyword tracking started", tracking });
 		keywordTracking(tracking);
 	} catch (err) {
-		console.error("Add keyword error: ", error.message);
+		console.error("Add keyword error: ", err.message);
 		if (err.code === 11000) return res.status(400).json({ success: false, message: "Already tracking this keyword" });
 		res.status(500).json({ success: false, message: "Server error" });
 	}
@@ -117,10 +116,8 @@ export const refreshKeyword = async (req, res) => {
 
 		doc.status = "checking";
 		await doc.save();
-		res.json({ success: true, message: "Rank check started" });
+		res.json({ success: true, message: "Rank check started", data: doc });
 		keywordTracking(doc);
-
-		return res.json({ success: true, data: doc });
 	} catch (err) {
 		console.error("Refresh keyword error: ", err.message);
 		return handleError(res, err);

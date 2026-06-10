@@ -31,7 +31,7 @@ export async function rankTracker(keyword, domain) {
 
         let found = null, allResults = [];
 
-        const cleanTarget = targetDomain.replace("www.", "").toLowerCase();
+        const cleanTarget = domain.replace("www.", "").toLowerCase();
 
         for (let gPage = 0; gPage < 5; gPage++) {
             await page.goto(`https://www.google.com/search?q=${encodeURIComponent(keyword)}&start=${gPage * 10}&num=10&hl=en&gl=us`, { waitUntil: "networkidle" })
@@ -100,7 +100,7 @@ export async function rankTracker(keyword, domain) {
             success: true,
             data: {
                 keyword,
-                targetDomain,
+                domain,
                 position: found?.position || null,
                 page: found?.page || null,
                 title: found?.title || "",

@@ -37,7 +37,7 @@ app.get('/', (req, res) => {
 
 // API Routes
 app.use('/api/v1/auth', authRoutes);
-app.use('api/v1/rankkeyword', authenticateJWT, keywordRoutes);
+app.use('/api/v1/rankkeyword', authenticateJWT, keywordRoutes);
 
 // 404 Handlerx
 app.use((req, res) => {
