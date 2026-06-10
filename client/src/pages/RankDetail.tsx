@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Target, Globe, Clock, TrendingUp, TrendingDown, Minus, RefreshCw, AlertCircle, ExternalLink, Trophy, Users, Calendar, Loader2 } from "lucide-react";
 import { dummyWebsiteRanking } from "../assets/assets";
+import { useApp } from "../context/AppContext";
 
 interface RankHistoryEntry {
     date: string;
@@ -38,6 +39,7 @@ interface TrackingData {
 }
 
 export default function RankDetail() {
+    const {api} = useApp();
     const { id } = useParams();
     const [tracking, setTracking] = useState<TrackingData | null>(null);
     const [loading, setLoading] = useState(true);
@@ -46,19 +48,42 @@ export default function RankDetail() {
     const chartRef = useRef<HTMLCanvasElement>(null);
 
     const fetchTracking = async () => {
-        setTimeout(() => {
-            setTracking(dummyWebsiteRanking);
+        try {
+            const res = await api.get(`/api/v1/rankkeyword/${id}`);
+            if (res.data.success) {
+                setTracking(res.data.data);
+            }
+        } catch (error) {
+            console.error("Error fetching tracking data:", error);
+        } finally {
             setLoading(false);
-        }, 1000);
+        }
     };
 
     const handleRefresh = async () => {
         if (!tracking) return;
         setRefreshing(true);
-        setTimeout(() => {
-            setTracking(dummyWebsiteRanking);
+        try {
+            await api.post(`/api/v1/rankkeyword/${tracking._id}/refresh`);
+            setTracking((prev) => prev ? { ...prev, status: "checking" } : prev); // Optimistic UI update
+            
+            const pollInterval = setInterval(async () => {
+                try {
+                    const check = await api.get(`/api/v1/rankkeyword/${tracking._id}`);
+                    if (check.data.status !== "checking") {
+                        clearInterval(pollInterval);
+                        setTracking(check.data.data);
+                        setRefreshing(false);
+                    }
+                } catch (error) {
+                    console.error("Error refreshing tracking data:", error);
+                }
+            }, 2000);
+        } catch (error) {
+            console.error("Error refreshing tracking data:", error);
+        } finally {
             setRefreshing(false);
-        }, 1000);
+        }
     };
 
     const drawChart = () => {
