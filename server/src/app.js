@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import authRoutes from './routes/auth.route.js';
 import keywordRoutes from './routes/rankTrack.route.js';
+import analysisRouter from './routes/analysis.route.js';
 import { authenticateJWT } from './middlewares/auth.middleware.js';
 
 const app = express();
@@ -27,7 +28,7 @@ app.use(express.static('public'));
 
 // 6. BODY PARSERS (Populates req.body for downstream routes)
 app.use(express.json({
-    limit:'16kb'
+  limit: '16kb'
 }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -38,6 +39,7 @@ app.get('/', (req, res) => {
 // API Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/rankkeyword', authenticateJWT, keywordRoutes);
+app.use('/api/v1/analysis', authenticateJWT, analysisRouter);
 
 // 404 Handlerx
 app.use((req, res) => {
@@ -50,7 +52,7 @@ app.use((req, res) => {
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error('Error:', err);
-  
+
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal server error',
