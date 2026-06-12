@@ -49,6 +49,7 @@ export default function Analyze() {
   const navigate = useNavigate();
 
   const handleAnalyze = async (submitUrl?: string) => {
+    setAnalyzing(true);
     const targetUrl = submitUrl || url;
     if (!targetUrl.trim()) return;
 
@@ -69,7 +70,7 @@ export default function Analyze() {
 
       // poll for completion
       let attempts = 0;
-      const maxAttempts = 30;
+      const maxAttempts = 60;
 
       pollRef.current = setInterval(async () => {
         attempts++;

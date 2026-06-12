@@ -1,7 +1,6 @@
-import { analyzeSeoData } from '../services/gemini.service';
-import { scrapeUrl } from '../services/scrapper.service';
-import Analysis from './../models/analysis.model';
-import { AIPErrorInterface } from './../../node_modules/gaxios/build/esm/src/common.d';
+import { analyzeSeoData } from '../services/gemini.service.js';
+import { scrapeUrl } from '../services/scrapper.service.js';
+import Analysis from './../models/analysis.model.js';
 
 const resolveUserId = (req) => {
     if (!req || !req.user) return null;
@@ -39,8 +38,8 @@ export const analyzeUrl = async (req, res) => {
             }
 
             // Step 2: Analyze with Gemini AI
-            const AIPErrorInterfaceResult = await analyzeSeoData(scrapeResult.data);
-
+            const aiResult = await analyzeSeoData(scrapeResult.data);
+            console.log("Analysis report from gemin: ", aiResult);
             if (!aiResult.success) {
                 analysis.status = "failed";
                 await analysis.save();
@@ -69,9 +68,8 @@ export const analyzeUrl = async (req, res) => {
                 analysis.status = "failed";
                 await analysis.save();
             } catch (saveError) {
-
+                console.log("Failed to save failed status: ", saveError.message);
             }
-            console.log("Failed to save failed status: ", saveError.message);
         }
     } catch (error) {
         console.error("Analyze URL error: ", error.message);

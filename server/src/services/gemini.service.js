@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 const ai = new GoogleGenAI({ apikey: process.env.GEMINI_API_KEY });
 
@@ -50,7 +50,7 @@ const seoAnalysisSchema = {
     required: ["overallScore", "categories", "keywords", "issues"],
 };
 
-export async function analyzeSeoData(scapeData) {
+export async function analyzeSeoData(scrapedData) {
     const prompt = `You are an expert SEO analyst. Analyze the following website data and provide a comprehensive SEO audit.
 
 Website URL: ${scrapedData.url}
@@ -110,8 +110,9 @@ Provide 5-15 issues sorted by severity (critical first). Be specific and actiona
 Extract top 10 keywords by frequency from the page content.`
 
     try {
+        console.log("Into the Gemini service function");
         const response = await ai.models.generateContent({
-            model: 'gemma-4-31b-it',
+            model: 'gemini-2.5-flash-lite',
             contents: [{ role: "user", parts: [{ text: prompt }] }],
             config: {
                 responseMimeType: "application/json",
@@ -119,10 +120,12 @@ Extract top 10 keywords by frequency from the page content.`
             }
         })
 
+        console.log("Gemini response: ", response);
+
         const analysis = JSON.parse(response.text);
         return { success: true, data: analysis }
     } catch (error) {
-        console.error("Gemini analysis error: ", error.message);    
-        return { success: false, error: error.message }    
+        console.error("Gemini analysis error: ", error.message);
+        return { success: false, error: error.message }
     }
 }

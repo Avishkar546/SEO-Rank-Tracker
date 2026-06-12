@@ -10,7 +10,8 @@ const issueSchema = new mongoose.Schema({
 const analysisSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     url: { type: String, required: true },
-    overallScore: {
+    overallScore: { type: Number, min: 0, max: 100, default: 0 },
+    categories: {
         seo: { type: Number, default: 0 },
         performance: { type: Number, default: 0 },
         accessibility: { type: Number, default: 0 },
