@@ -5,6 +5,7 @@ import dns from 'dns';
 dns.setServers(['8.8.8.8', '8.8.4.4']);
 import {connectToDB} from './src/config/db.config.js'
 import app from './src/app.js';
+import { startRankTrackingCron } from './src/cron/rankTracking.cron.js';
 
 const port = process.env.PORT || 3000;
 
@@ -14,6 +15,8 @@ connectToDB()
       console.log('Error: ' + err.message);
       throw err;
     });
+
+    startRankTrackingCron()
 
     // console.log(process.env.PORT);
     app.listen(8080, () => {
