@@ -5,8 +5,25 @@ const bb = new Browserbase({
     apiKey: process.env.BROWSERBASE_API_KEY,
 });
 
-export async function scrapeUrl(url) {
+export async function scrapeUrl(url, signal) {
     let browser;
+
+    const abortHandler = async () => {
+        console.log("[SCRAPER] Abort signal received. Closing browser session...");
+        if (browser) {
+            try {
+                await browser.close();
+            } catch (err) {
+                console.log("[SCRAPER] Error closing browser on abort:", err.message);
+            }
+            browser = null;
+        }
+    };
+
+    if (signal) {
+        signal.addEventListener("abort", abortHandler);
+    }
+
     try {
         // Create a new session
         const session = await bb.sessions.create({ browserSettings: { blockAds: true } });
@@ -22,8 +39,10 @@ export async function scrapeUrl(url) {
         try {
             response = await page.goto(url, { waitUntil: "domcontentloaded" });
         } catch (navError) {
-            await browser.close().catch(() => { });
-            browser = null;
+            if (browser) {
+                await browser.close().catch(() => { });
+                browser = null;
+            }
             return { success: false, error: navError.message }
         }
 
@@ -95,7 +114,14 @@ export async function scrapeUrl(url) {
 
         const statusCode = response?.status() || 0;
         await page.close();
-        await browser.close();
+        if (browser) {
+            await browser.close();
+            browser = null;
+        }
+
+        if (signal) {
+            signal.removeEventListener("abort", abortHandler);
+        }
 
         return {
             success: true,
@@ -106,9 +132,13 @@ export async function scrapeUrl(url) {
         if (browser) {
             try {
                 await browser.close();
-            } catch (error) {
-                console.log("[SCRAPER] Browser close failed: ", error.message);
+            } catch (closeError) {
+                console.log("[SCRAPER] Browser close failed: ", closeError.message);
             }
         }
+        if (signal) {
+            signal.removeEventListener("abort", abortHandler);
+        }
+        return { success: false, error: error.message }
     }
 }

@@ -60,7 +60,8 @@ const analysisSchema = new mongoose.Schema({
     loadTime: { type: Number, default: 0 },
     pageSize: { type: Number, default: 0 },
     wordCount: { type: Number, default: 0 },
-    status: { type: String, enum: ["pending", "processing", "completed", "failed"], default: "pending" },
+    status: { type: String, enum: ["pending", "processing", "completed", "failed", "aborted"], default: "pending" },
+    errorMessage: { type: String, default: "" },
 }, {
     timestamps: true
 })

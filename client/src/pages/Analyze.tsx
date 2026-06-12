@@ -45,11 +45,13 @@ export default function Analyze() {
   const [error, setError] = useState("");
   const [searchParams] = useSearchParams();
   const pollRef = useRef<any>(null);
+  const [analysisId, setAnalysisId] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
   const handleAnalyze = async (submitUrl?: string) => {
     setAnalyzing(true);
+    setError("");
     const targetUrl = submitUrl || url;
     if (!targetUrl.trim()) return;
 
@@ -64,6 +66,7 @@ export default function Analyze() {
       }
 
       const id = res.data.analysisId;
+      setAnalysisId(id);
 
       // Step 1: Scanning
       setCurrentStep(1);
@@ -78,6 +81,7 @@ export default function Analyze() {
           clearInterval(pollRef.current);
           setError("Analysis timed out. Please try again.");
           setAnalyzing(false);
+          setAnalysisId(null);
           return;
         }
 
@@ -89,16 +93,27 @@ export default function Analyze() {
             setCurrentStep(3);
 
             // Simulate AI analysis time
-            setTimeout(() => navigate(`/report/${id}`), 1000);
+            setTimeout(() => {
+              setAnalysisId(null);
+              navigate(`/report/${id}`);
+            }, 1000);
           } else if (analysis.status === "failed") {
             if (pollRef.current) clearInterval(pollRef.current);
-            setError("Analysis failed. Please try again.");
+            setError(analysis.errorMessage || "Analysis failed. Please try again.");
             setAnalyzing(false);
+            setAnalysisId(null);
+          } else if (analysis.status === "aborted") {
+            if (pollRef.current) clearInterval(pollRef.current);
+            setError("Analysis was aborted.");
+            setAnalyzing(false);
+            setAnalysisId(null);
           } else {
             if (attempts > 5) setCurrentStep(2); // Ensure we show scanning step after a few seconds
             console.log("Analysis status:", analysis.status);
           }
-        } catch {}
+        } catch {
+          // If network error during polling, we can keep polling or abort if multiple fail
+        }
       }, 2000);
     } catch (err: any) {
       console.error("Analysis error:", err);
@@ -106,7 +121,23 @@ export default function Analyze() {
         err.message || "An unexpected error occurred. Please try again.",
       );
       setAnalyzing(false);
+      setAnalysisId(null);
       return;
+    }
+  };
+
+  const handleAbort = async () => {
+    if (!analysisId) return;
+    try {
+      if (pollRef.current) clearInterval(pollRef.current);
+      setAnalyzing(false);
+      setError("Analysis aborted.");
+
+      await api.post(`/api/v1/analysis/${analysisId}/abort`);
+    } catch (err: any) {
+      console.error("Failed to abort analysis:", err);
+    } finally {
+      setAnalysisId(null);
     }
   };
 
@@ -247,9 +278,19 @@ export default function Analyze() {
               })}
             </div>
 
-            <p className="text-center text-xs text-muted-foreground mt-8">
-              This may take 15-30 seconds depending on the website.
-            </p>
+            <div className="mt-8 text-center space-y-4">
+              <button
+                type="button"
+                onClick={handleAbort}
+                className="px-6 py-2.5 rounded-full border border-danger/30 text-danger hover:bg-danger/10 transition-colors text-sm font-medium cursor-pointer"
+                id="abort-analysis-btn"
+              >
+                Abort Analysis
+              </button>
+              <p className="text-xs text-muted-foreground">
+                This may take 15-30 seconds depending on the website.
+              </p>
+            </div>
           </div>
         )}
       </div>

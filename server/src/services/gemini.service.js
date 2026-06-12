@@ -50,7 +50,7 @@ const seoAnalysisSchema = {
     required: ["overallScore", "categories", "keywords", "issues"],
 };
 
-export async function analyzeSeoData(scrapedData) {
+export async function analyzeSeoData(scrapedData, signal) {
     const prompt = `You are an expert SEO analyst. Analyze the following website data and provide a comprehensive SEO audit.
 
 Website URL: ${scrapedData.url}
@@ -118,7 +118,7 @@ Extract top 10 keywords by frequency from the page content.`
                 responseMimeType: "application/json",
                 responseSchema: seoAnalysisSchema
             }
-        })
+        }, { signal })
 
         console.log("Gemini response: ", response);
 
