@@ -19,8 +19,7 @@ interface AnalysisSummary {
 }
 
 export default function Dashboard() {
-    const {api} = useApp();
-    const user = { name: "John Doe", plan: "free", analysisCount: 2 };
+    const { user, api } = useApp();
     const navigate = useNavigate();
     const [url, setUrl] = useState("");
     const [analyses, setAnalyses] = useState<AnalysisSummary[]>([]);
@@ -28,8 +27,8 @@ export default function Dashboard() {
 
     const fetchRecent = async () => {
         try {
-            const {data} = await api.get("/api/v1/analysis/list?limit=6");
-            if(data.success) setAnalyses(data.analyses);
+            const { data } = await api.get("/api/v1/analysis/list?limit=6");
+            if (data.success) setAnalyses(data.analyses);
         } catch (error) {
             console.error("Error fetching recent analyses:", error);
         } finally {

@@ -177,7 +177,7 @@ export const deleteAnalysis = async (req, res) => {
 
         const deletedDoc = await Analysis.findByIdAndDelete(id);
         if (!deletedDoc) return res.status(404).json({ success: false, message: 'Analysis doesnt exist to delete' });
-        res.status(204).json({ success: false, message: `${id} deleted` });
+        res.status(204).json({ success: true, message: `${id} deleted` });
     } catch (error) {
         console.error("Delete analysis error: ", error.message);
         res.status(500).json({ success: false, message: 'Server error' });

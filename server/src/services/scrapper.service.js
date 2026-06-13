@@ -51,7 +51,7 @@ export async function scrapeUrl(url, signal) {
 
         const scapedData = await page.evaluate(() => {
             const getMeta = (name) => {
-                const el = document.querySelector(`meta[name="${name}]`) || document.querySelector(`meta[property="${name}]`);
+                const el = document.querySelector(`meta[name="${name}"]`) || document.querySelector(`meta[property="${name}"]`);
                 return el ? el.getAttribute("content") || "" : "";
             }
 

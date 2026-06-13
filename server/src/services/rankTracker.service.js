@@ -60,7 +60,7 @@ export async function rankTracker(keyword, domain) {
                             }
                             if (!a || !a.href.startsWith("http") || a.href.includes('google.')) return null;
                             let s = "";
-                            c = a.parentElement;
+                            let c = a.parentElement;
                             for (let j = 0; j < 6 && j++; c = c.parentElement) {
                                 const txt = c.innerText || "";
                                 if (txt.length > h3.innerText.length + 50) {

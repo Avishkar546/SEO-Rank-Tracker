@@ -26,7 +26,7 @@ export const addKeyword = async (req, res) => {
 		let domain;
 		try {
 			let urlObj = new URL(url.startsWith("http") ? url : `https://${url}`);
-			domain = urlObj.hostname.replace("www", "");
+			domain = urlObj.hostname.replace("www.", "");
 		} catch (error) {
 			return res.status(400).json({ success: false, message: "Invalid URL format" });
 		}

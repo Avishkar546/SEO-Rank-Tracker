@@ -3,7 +3,7 @@ dotenv.config();
 
 import dns from 'dns';
 dns.setServers(['8.8.8.8', '8.8.4.4']);
-import {connectToDB} from './src/config/db.config.js'
+import { connectToDB } from './src/config/db.config.js'
 import app from './src/app.js';
 import { startRankTrackingCron } from './src/cron/rankTracking.cron.js';
 
@@ -19,7 +19,7 @@ connectToDB()
     startRankTrackingCron()
 
     // console.log(process.env.PORT);
-    app.listen(8080, () => {
+    app.listen(port, () => {
       console.log(`Example app listening on port ${8080}`);
     });
   })

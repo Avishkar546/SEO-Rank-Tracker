@@ -15,19 +15,19 @@ import Loading from "./components/Loading";
 
 export default function App() {
     const location = useLocation();
-    const {user, loading} = useApp();
+    const { user, loading } = useApp();
 
     const hideNavbar = ["/login", "/register"].includes(location.pathname);
 
-    if(loading) <Loading />
+    if (loading) return <Loading />
     return (
         <>
             <Toaster />
             {!hideNavbar && <Navbar />}
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={user? <Navigate to="/dashboard" replace/> : <Login state="login" />} />
-                <Route path="/register" element={user? <Navigate to="/dashboard" replace/> : <Login state="register" />} />
+                <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login state="login" />} />
+                <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <Login state="register" />} />
                 <Route element={<ProtectedRoute />}>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/analyze" element={<Analyze />} />

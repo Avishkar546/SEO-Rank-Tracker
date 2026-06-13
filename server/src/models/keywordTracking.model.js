@@ -59,9 +59,9 @@ const keywordTrackingSchema = new mongoose.Schema({
     lastChecked: { type: Date, default: null },
     status: { type: String, enum: ["pending", "checking", "completed", "failed"], default: "pending" },
 }, {
-    timpestamps: true
+    timestamps: true
 })
 
-keywordTrackingSchema.index({userId:1, keyword:1, domain:1}, {unique:true})
+keywordTrackingSchema.index({ userId: 1, keyword: 1, domain: 1 }, { unique: true })
 
 export const KeywordTracking = mongoose.model("keywordTracking", keywordTrackingSchema);
